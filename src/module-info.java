@@ -1,0 +1,2 @@
+module Merkle_Voting {
+}
