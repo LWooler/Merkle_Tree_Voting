@@ -1,5 +1,7 @@
 package driver;
 
+import java.util.ArrayList;
+
 /*****************************************
 ** File:    Driver.java
 ** Project: CSCE 314 Project 1, Fall 2020
@@ -34,7 +36,11 @@ public class Driver {
 		
 		Government_Database database = new Government_Database();
 		
-		Voter[] voters = {voter1, voter2, voter3};
+		ArrayList<Voter> voters = new ArrayList<Voter>();
+		voters.add(voter1);
+		voters.add(voter2);
+		voters.add(voter3);
+		
 		Merkle_Tree tree = new Merkle_Tree(voters);
 		
 		Node node = new Node("23878438329G");

@@ -15,11 +15,12 @@ package driver;
 
 public class Node {
 	//data members
-	public String hash;
+	private String hash;
 	private Node left;
 	private Node right;
 	
 	//methods
+	public String getHash() {return this.hash;}
 	public void setLeft(Node node) {this.left = node;}
 	public void setRight(Node node) {this.right = node;}
 	
