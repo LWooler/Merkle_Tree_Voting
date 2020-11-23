@@ -1,6 +1,12 @@
 package driver;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Stack;
+
 
 /*****************************************
 ** File:    Merkle_Tree.java
@@ -18,6 +24,7 @@ import java.util.ArrayList;
 public class Merkle_Tree {
 	//data members
 	private Node rootNode;
+	private ArrayList<String> minimum_to_verify = new ArrayList<String>();
 	
 	//methods
 	//-------------------------------------------------------
@@ -30,16 +37,62 @@ public class Merkle_Tree {
 		return rootNode.getHash();
 	}
 	
-	public Node[] findHash() {
-		return null;
+	public ArrayList<String> findHash(String hash) {
+		Stack<String> dfs_stack = new Stack<String>();
+		dfs(hash, this.rootNode, dfs_stack);
+		ArrayList<String> temp = new ArrayList<String>();
+		while(!(this.minimum_to_verify.isEmpty())) {
+			temp.add(this.minimum_to_verify.remove(0));
+		}
+		return temp;
+	}
+	
+	public String dfs(String hash, Node node, Stack<String> dfs_stack) {
+		dfs_stack.push(node.getHash());
+		//System.out.println(dfs_stack.toString());
+		//System.out.println("Checking "+node.getHash()+" with "+hash);
+		if (node.getHash().equals(hash)) {
+			//System.out.println("found");
+			return dfs_stack.toString();
+		}
+		if (node.getLeft() != null) {
+			String s1 = dfs(hash, node.getLeft(),dfs_stack);
+			String s2 = dfs(hash, node.getRight(),dfs_stack);
+			dfs_stack.pop();
+			if (!(s1.isEmpty())) {
+				//System.out.print(node.getRight().getHash());
+				minimum_to_verify.add("right");
+				minimum_to_verify.add(node.getRight().getHash());
+				return s1;
+			}
+			else if (!(s2.isEmpty())) {
+				minimum_to_verify.add("left");
+				minimum_to_verify.add(node.getLeft().getHash());
+				return s2;
+			}
+			else {
+				return "";
+			}
+		}
+		else {
+			dfs_stack.pop();
+		}
+		return "";
 	}
 	
 	private String generateHash(String s1, String s2) {
-		return s1 + s2;
-	}
-	
-	private String generateHash(Voter voter) {
-		return voter.getfirstName();
+		MessageDigest digest = null;
+		try {
+			digest = MessageDigest.getInstance("SHA-256");
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String s_to_hash = s1 + s2;
+		byte[] hash = digest.digest(s_to_hash.getBytes(StandardCharsets.UTF_8));
+		String encoded = Base64.getEncoder().encodeToString(hash);
+		//return encoded;
+		return "[" + s1 + s2 + "]";
 	}
 	
 	private void generateTree(ArrayList<Node> hashes) {
@@ -58,7 +111,7 @@ public class Merkle_Tree {
 					node2 = hashes.remove(0);
 				}
 				Node newNode = new Node(generateHash(node1.getHash(), node2.getHash()));
-				System.out.println(newNode.getHash());
+				//System.out.println(newNode.getHash());
 				newNode.setLeft(node1);
 				newNode.setRight(node2);
 				nextLevel.add(newNode);
@@ -72,7 +125,8 @@ public class Merkle_Tree {
 		ArrayList<Node> voterHashes = new ArrayList<Node>();
 		while (!(voters.isEmpty())) {
 			Voter voter = voters.remove(0);
-			Node newNode = new Node(generateHash(voter));
+			Node newNode = new Node(voter.generateHash());
+			//System.out.println(newNode.getHash());
 			voterHashes.add(newNode);
 		}
 		generateTree(voterHashes);

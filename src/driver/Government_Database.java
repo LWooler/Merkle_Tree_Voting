@@ -1,4 +1,7 @@
 package driver;
+
+import java.util.ArrayList;
+
 /*****************************************
 ** File:    Government_Database.java
 ** Project: CSCE 314 Project 1, Fall 2020
@@ -26,9 +29,9 @@ public class Government_Database {
 	// PreCondition:  Voter hash exists within database
 	// PostCondition: Returns minimum hashes needed to verify data
 	//---------------------------------------------------------
-	public String[] hashArray() {
+	public ArrayList<String> getHashArray(String voter_hash) {
 		//array of hashes to send to Polling Station to use for verification
-		return null;
+		return voterDatabase.findHash(voter_hash);
 	}
 	
 	//-------------------------------------------------------
@@ -38,11 +41,12 @@ public class Government_Database {
 	//---------------------------------------------------------
 	public String rootHash() {
 		//creates a merkle tree of all voters and return root hash
-		return null;
+		return rootHash;
 	}
 	
 	//constructors
-	public Government_Database() {
-		
+	public Government_Database(ArrayList<Voter> voters) {
+		this.voterDatabase = new Merkle_Tree(voters);
+		this.rootHash = this.voterDatabase.getRoot();
 	}
 }

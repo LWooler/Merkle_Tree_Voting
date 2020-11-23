@@ -23,6 +23,8 @@ public class Node {
 	public String getHash() {return this.hash;}
 	public void setLeft(Node node) {this.left = node;}
 	public void setRight(Node node) {this.right = node;}
+	public Node getLeft() {return this.left;}
+	public Node getRight() {return this.right;}
 	
 	//constructors
 	public Node(String hash) {
